@@ -1,6 +1,7 @@
 import express from 'express';
 import Hostel from '../models/hostelModal.js';
 import { authenticateJwt } from '../middleware/auth.js';
+import Admin from '../models/adminModal.js';
 
 const hostelRoutes = express.Router();
 
@@ -21,17 +22,24 @@ hostelRoutes.post('/getHostels', authenticateJwt, async (req, res) => {
 
 hostelRoutes.post('/addHostel', authenticateJwt, async (req, res) => {
   try {
-    const newHostel = new Hostel({
-      userId: req.body.userId,
-      hostelName: req.body.hostelName,
-      hostelAddress: req.body.hostelAddress,
+    const findAdmin = await Admin.findOne({
+      _id: req.body.userId,
     });
-    const hostel = await newHostel.save();
-    res.status(201).send({
-      success: true,
-      message: 'Hostel added succesfully.',
-      data: hostel,
-    });
+    if (findAdmin) {
+      const newHostel = new Hostel({
+        userId: req.body.userId,
+        hostelName: req.body.hostelName,
+        hostelAddress: req.body.hostelAddress,
+      });
+      const hostel = await newHostel.save();
+      res.status(201).send({
+        success: true,
+        message: 'Hostel added succesfully.',
+        data: hostel,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Admin not found' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }

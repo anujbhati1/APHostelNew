@@ -24,7 +24,6 @@ floorRoutes.post('/addFloor', authenticateJwt, async (req, res) => {
       userId: req.body.userId,
       _id: req.body.hostelId,
     });
-    console.log(findHostel);
     if (findHostel) {
       const newFloor = new Floor({
         userId: req.body.userId,

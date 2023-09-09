@@ -70,18 +70,27 @@ roomRoutes.post('/getAllEmptyRooms', authenticateJwt, async (req, res) => {
 
 roomRoutes.post('/addRoom', authenticateJwt, async (req, res) => {
   try {
-    const newRoom = new Room({
+    const findFloor = await Floor.findOne({
       userId: req.body.userId,
       hostelId: req.body.hostelId,
-      floorId: req.body.floorId,
-      roomName: req.body.roomName,
+      _id: req.body.floorId,
     });
-    const room = await newRoom.save();
-    res.status(201).send({
-      success: true,
-      message: 'Room added succesfully.',
-      data: room,
-    });
+    if (findFloor) {
+      const newRoom = new Room({
+        userId: req.body.userId,
+        hostelId: req.body.hostelId,
+        floorId: req.body.floorId,
+        roomName: req.body.roomName,
+      });
+      const room = await newRoom.save();
+      res.status(201).send({
+        success: true,
+        message: 'Room added succesfully.',
+        data: room,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Floor not found' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
