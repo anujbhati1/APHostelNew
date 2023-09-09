@@ -6,6 +6,7 @@ import floorRoutes from './routes/floorRoutes.js';
 import roomRoutes from './routes/roomRoutes.js';
 import bedRoutes from './routes/bedRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 mongoose
   .connect('mongodb://localhost:27017/Hostel')
@@ -22,7 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = 3000;
 
-app.use('/api', userRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api', hostelRoutes);
 app.use('/api', floorRoutes);
 app.use('/api', roomRoutes);

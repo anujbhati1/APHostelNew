@@ -2,11 +2,9 @@ import mongoose from 'mongoose';
 
 const floorSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
-    hostelId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+    hostelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hostel' },
     floorName: { type: String, required: true },
-    seatAvailible: { type: Boolean, required: true },
-    noOfseatAvai: { type: Number },
   },
   {
     timestamps: true,

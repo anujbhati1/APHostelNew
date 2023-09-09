@@ -1,10 +1,11 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Floor from '../models/floorModal.js';
+import { authenticateJwt } from '../middleware/auth.js';
 
 const floorRoutes = express.Router();
 
-floorRoutes.post('/getFloors', async (req, res) => {
+floorRoutes.post('/getFloors', authenticateJwt, async (req, res) => {
   const floors = await Floor.find({ hostelId: req.body.hostelId });
   res.status(200).send({
     success: true,
@@ -15,6 +16,7 @@ floorRoutes.post('/getFloors', async (req, res) => {
 
 floorRoutes.post(
   '/addFloor',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const newFloor = new Floor({
       userId: req.body.userId,
@@ -34,6 +36,7 @@ floorRoutes.post(
 
 floorRoutes.delete(
   '/deleteFloor',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const find = await Floor.findById(req.body.floorId);
     if (find) {

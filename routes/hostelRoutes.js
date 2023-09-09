@@ -1,10 +1,11 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Hostel from '../models/hostelModal.js';
+import { authenticateJwt } from '../middleware/auth.js';
 
 const hostelRoutes = express.Router();
 
-hostelRoutes.post('/getHostels', async (req, res) => {
+hostelRoutes.post('/getHostels', authenticateJwt, async (req, res) => {
   const hostels = await Hostel.find({
     userId: req.body.userId,
   });
@@ -17,13 +18,12 @@ hostelRoutes.post('/getHostels', async (req, res) => {
 
 hostelRoutes.post(
   '/addHostel',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const newHostel = new Hostel({
       userId: req.body.userId,
       hostelName: req.body.hostelName,
-      noOfseatAvai: req.body.noOfseatAvai,
-      seatAvailible: req.body.seatAvailible,
-      totalSeats: req.body.totalSeats,
+      hostelAddress: req.body.hostelAddress,
     });
     const hostel = await newHostel.save();
     res.status(201).send({
@@ -36,6 +36,7 @@ hostelRoutes.post(
 
 hostelRoutes.delete(
   '/deleteHostel',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const find = await Hostel.findById(req.body.hostelId);
     if (find) {

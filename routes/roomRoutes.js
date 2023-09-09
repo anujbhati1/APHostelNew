@@ -3,10 +3,11 @@ import expressAsyncHandler from 'express-async-handler';
 import Room from '../models/roomModal.js';
 import Hostel from '../models/hostelModal.js';
 import Floor from '../models/floorModal.js';
+import { authenticateJwt } from '../middleware/auth.js';
 
 const roomRoutes = express.Router();
 
-roomRoutes.post('/getRooms', async (req, res) => {
+roomRoutes.post('/getRooms', authenticateJwt, async (req, res) => {
   const rooms = await Room.find({
     hostelId: req.body.hostelId,
     floorId: req.body.floorId,
@@ -18,7 +19,7 @@ roomRoutes.post('/getRooms', async (req, res) => {
   });
 });
 
-roomRoutes.post('/getAllEmptyRooms', async (req, res) => {
+roomRoutes.post('/getAllEmptyRooms', authenticateJwt, async (req, res) => {
   let hostels = await Hostel.find({
     userId: req.body.userId,
   });
@@ -62,6 +63,7 @@ roomRoutes.post('/getAllEmptyRooms', async (req, res) => {
 
 roomRoutes.post(
   '/addRoom',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const newRoom = new Room({
       userId: req.body.userId,
@@ -84,6 +86,7 @@ roomRoutes.post(
 
 roomRoutes.delete(
   '/deleteRoom',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const find = await Room.findById(req.body.roomId);
     if (find) {

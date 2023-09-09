@@ -1,35 +1,44 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
-import User from '../models/userModal.js';
 import jwt from 'jsonwebtoken';
+import { SECRET } from '../middleware/auth.js';
+import Admin from '../models/adminModal.js';
 
-const userRoutes = express.Router();
+const adminRoutes = express.Router();
 
-userRoutes.post('/login', async (req, res) => {
-  const user = await User.findOne({
+adminRoutes.post('/login', async (req, res) => {
+  const user = await Admin.findOne({
     email: req.body.email,
   });
   if (user) {
+    const token = jwt.sign(
+      { username: req.body.email, role: 'admin' },
+      SECRET,
+      {
+        expiresIn: '1h',
+      }
+    );
     res.status(200).send({
       success: true,
       message: 'Login successful',
+      token,
       data: user,
     });
   } else {
     res.status(404).send({
       success: false,
-      message: 'User not found.',
+      message: 'Admin not found.',
     });
   }
 });
 
-userRoutes.post(
+adminRoutes.post(
   '/signup',
   expressAsyncHandler(async (req, res) => {
-    const findEmail = await User.findOne({
+    const findEmail = await Admin.findOne({
       email: req.body.email,
     });
-    const findMobile = await User.findOne({
+    const findMobile = await Admin.findOne({
       mobileNo: req.body.mobileNo,
     });
     console.log(findEmail, findMobile);
@@ -45,19 +54,24 @@ userRoutes.post(
           message: 'Mobile already registered.',
         });
       } else {
-        const newUser = new User({
+        const newUser = new Admin({
           name: req.body.name,
           email: req.body.email,
           mobileNo: req.body.mobileNo,
           password: req.body.password,
         });
         const user = await newUser.save();
-        const token = jwt.sign({ username, role: 'user' }, SECRET, {
-          expiresIn: '1h',
-        });
+        const token = jwt.sign(
+          { username: req.body.email, role: 'admin' },
+          SECRET,
+          {
+            expiresIn: '1h',
+          }
+        );
         res.status(201).send({
           success: true,
-          message: 'User registered succesfully.',
+          message: 'Admin registered succesfully.',
+          token,
           data: user,
         });
       }
@@ -65,4 +79,4 @@ userRoutes.post(
   })
 );
 
-export default userRoutes;
+export default adminRoutes;

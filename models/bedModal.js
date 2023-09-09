@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 
 const bedSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
-    hostelId: { type: String, required: true },
-    floorId: { type: String, required: true },
-    roomId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+    hostelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hostel' },
+    floorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Floor' },
+    roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
     bedName: { type: String, required: true },
     amont: { type: Number },
     seatAvailible: { type: Boolean, required: true },

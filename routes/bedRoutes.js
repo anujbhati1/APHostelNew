@@ -1,10 +1,11 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Bed from '../models/bedModal.js';
+import { authenticateJwt } from '../middleware/auth.js';
 
 const bedRoutes = express.Router();
 
-bedRoutes.post('/getBeds', async (req, res) => {
+bedRoutes.post('/getBeds', authenticateJwt, async (req, res) => {
   const beds = await Bed.find({
     hostelId: req.body.hostelId,
     floorId: req.body.floorId,
@@ -19,6 +20,7 @@ bedRoutes.post('/getBeds', async (req, res) => {
 
 bedRoutes.post(
   '/addBed',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const newBed = new Bed({
       userId: req.body.userId,
@@ -47,6 +49,7 @@ bedRoutes.post(
 
 bedRoutes.delete(
   '/deleteBed',
+  authenticateJwt,
   expressAsyncHandler(async (req, res) => {
     const find = await Bed.findById(req.body.bedId);
     if (find) {
