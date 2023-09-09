@@ -9,6 +9,7 @@ adminRoutes.post('/login', async (req, res) => {
   try {
     const user = await Admin.findOne({
       email: req.body.email,
+      password: req.body.password,
     });
     if (user) {
       const token = jwt.sign(
@@ -27,7 +28,7 @@ adminRoutes.post('/login', async (req, res) => {
     } else {
       res.status(404).send({
         success: false,
-        message: 'Admin not found.',
+        message: 'Invalid credentials',
       });
     }
   } catch (e) {
@@ -43,7 +44,6 @@ adminRoutes.post('/signup', async (req, res) => {
     const findMobile = await Admin.findOne({
       mobileNo: req.body.mobileNo,
     });
-    console.log(findEmail, findMobile);
     if (findEmail) {
       res.status(409).send({
         success: false,

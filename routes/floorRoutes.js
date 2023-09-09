@@ -1,6 +1,7 @@
 import express from 'express';
 import Floor from '../models/floorModal.js';
 import { authenticateJwt } from '../middleware/auth.js';
+import Hostel from '../models/hostelModal.js';
 
 const floorRoutes = express.Router();
 
@@ -19,19 +20,26 @@ floorRoutes.post('/getFloors', authenticateJwt, async (req, res) => {
 
 floorRoutes.post('/addFloor', authenticateJwt, async (req, res) => {
   try {
-    const newFloor = new Floor({
+    const findHostel = await Hostel.findOne({
       userId: req.body.userId,
-      hostelId: req.body.hostelId,
-      floorName: req.body.floorName,
-      seatAvailible: req.body.seatAvailible,
-      noOfseatAvai: req.body.noOfseatAvai,
+      _id: req.body.hostelId,
     });
-    const floor = await newFloor.save();
-    res.status(201).send({
-      success: true,
-      message: 'Floor added succesfully.',
-      data: floor,
-    });
+    console.log(findHostel);
+    if (findHostel) {
+      const newFloor = new Floor({
+        userId: req.body.userId,
+        hostelId: req.body.hostelId,
+        floorName: req.body.floorName,
+      });
+      const floor = await newFloor.save();
+      res.status(201).send({
+        success: true,
+        message: 'Floor added succesfully.',
+        data: floor,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Hostel not found' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }

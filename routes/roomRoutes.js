@@ -75,10 +75,6 @@ roomRoutes.post('/addRoom', authenticateJwt, async (req, res) => {
       hostelId: req.body.hostelId,
       floorId: req.body.floorId,
       roomName: req.body.roomName,
-      seatAvailible: req.body.seatAvailible,
-      totalSeat: req.body.totalSeat,
-      noOfSeatAvai: req.body.noOfSeatAvai,
-      amont: req.body.amont,
     });
     const room = await newRoom.save();
     res.status(201).send({

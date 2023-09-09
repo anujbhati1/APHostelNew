@@ -31,13 +31,6 @@ bedRoutes.post('/addBed', authenticateJwt, async (req, res) => {
       bedName: req.body.bedName,
       amont: req.body.amont,
       seatAvailible: req.body.seatAvailible,
-      cName: req.body.cName,
-      monthStart: req.body.monthStart,
-      mobileNo: req.body.mobileNo,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
-      pendingAmt: req.body.pendingAmt,
-      duesClear: req.body.duesClear,
     });
     const bed = await newBed.save();
     res.status(201).send({
