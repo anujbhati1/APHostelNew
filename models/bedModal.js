@@ -9,13 +9,6 @@ const bedSchema = new mongoose.Schema(
     bedName: { type: String, required: true },
     amont: { type: Number },
     seatAvailible: { type: Boolean, required: true },
-    cName: { type: String },
-    mobileNo: { type: String },
-    startDate: { type: String },
-    monthStart: { type: String },
-    endDate: { type: String },
-    pendingAmt: { type: Number },
-    duesClear: { type: Boolean },
   },
   {
     timestamps: true,
