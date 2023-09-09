@@ -1,5 +1,4 @@
 import express from 'express';
-import expressAsyncHandler from 'express-async-handler';
 import Room from '../models/roomModal.js';
 import Hostel from '../models/hostelModal.js';
 import Floor from '../models/floorModal.js';
@@ -8,63 +7,69 @@ import { authenticateJwt } from '../middleware/auth.js';
 const roomRoutes = express.Router();
 
 roomRoutes.post('/getRooms', authenticateJwt, async (req, res) => {
-  const rooms = await Room.find({
-    hostelId: req.body.hostelId,
-    floorId: req.body.floorId,
-  });
-  res.status(200).send({
-    success: true,
-    message: 'Succesfully get rooms',
-    data: rooms,
-  });
+  try {
+    const rooms = await Room.find({
+      hostelId: req.body.hostelId,
+      floorId: req.body.floorId,
+    });
+    res.status(200).send({
+      success: true,
+      message: 'Succesfully get rooms',
+      data: rooms,
+    });
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
 });
 
 roomRoutes.post('/getAllEmptyRooms', authenticateJwt, async (req, res) => {
-  let hostels = await Hostel.find({
-    userId: req.body.userId,
-  });
-  let floors = await Floor.find({
-    userId: req.body.userId,
-  });
-  let rooms = await Room.find({
-    seatAvailible: true,
-    userId: req.body.userId,
-  });
+  try {
+    let hostels = await Hostel.find({
+      userId: req.body.userId,
+    });
+    let floors = await Floor.find({
+      userId: req.body.userId,
+    });
+    let rooms = await Room.find({
+      seatAvailible: true,
+      userId: req.body.userId,
+    });
 
-  function getAllRooms() {
-    let temArr = [];
-    for (let i = 0; i < rooms.length; i++) {
-      for (let k = 0; k < floors.length; k++) {
-        for (let j = 0; j < hostels.length; j++) {
-          if (
-            rooms[i].hostelId == hostels[j]._id + '' &&
-            rooms[i].floorId == floors[k]._id + ''
-          ) {
-            temArr.push({
-              ...rooms[i].toObject(),
-              hostelData: hostels[j].toObject(),
-              floorData: floors[k].toObject(),
-            });
+    function getAllRooms() {
+      let temArr = [];
+      for (let i = 0; i < rooms.length; i++) {
+        for (let k = 0; k < floors.length; k++) {
+          for (let j = 0; j < hostels.length; j++) {
+            if (
+              rooms[i].hostelId == hostels[j]._id + '' &&
+              rooms[i].floorId == floors[k]._id + ''
+            ) {
+              temArr.push({
+                ...rooms[i].toObject(),
+                hostelData: hostels[j].toObject(),
+                floorData: floors[k].toObject(),
+              });
+            }
           }
         }
       }
+      return temArr;
     }
-    return temArr;
+
+    const data = getAllRooms();
+
+    res.status(200).send({
+      success: true,
+      message: 'Succesfully get rooms',
+      data: data,
+    });
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
   }
-
-  const data = getAllRooms();
-
-  res.status(200).send({
-    success: true,
-    message: 'Succesfully get rooms',
-    data: data,
-  });
 });
 
-roomRoutes.post(
-  '/addRoom',
-  authenticateJwt,
-  expressAsyncHandler(async (req, res) => {
+roomRoutes.post('/addRoom', authenticateJwt, async (req, res) => {
+  try {
     const newRoom = new Room({
       userId: req.body.userId,
       hostelId: req.body.hostelId,
@@ -81,13 +86,13 @@ roomRoutes.post(
       message: 'Room added succesfully.',
       data: room,
     });
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
-roomRoutes.delete(
-  '/deleteRoom',
-  authenticateJwt,
-  expressAsyncHandler(async (req, res) => {
+roomRoutes.delete('/deleteRoom', authenticateJwt, async (req, res) => {
+  try {
     const find = await Room.findById(req.body.roomId);
     if (find) {
       await Room.deleteOne({
@@ -100,7 +105,9 @@ roomRoutes.delete(
     } else {
       res.status(404).send({ success: false, message: 'Room not found' });
     }
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
 export default roomRoutes;

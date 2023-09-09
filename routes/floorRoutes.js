@@ -1,23 +1,24 @@
 import express from 'express';
-import expressAsyncHandler from 'express-async-handler';
 import Floor from '../models/floorModal.js';
 import { authenticateJwt } from '../middleware/auth.js';
 
 const floorRoutes = express.Router();
 
 floorRoutes.post('/getFloors', authenticateJwt, async (req, res) => {
-  const floors = await Floor.find({ hostelId: req.body.hostelId });
-  res.status(200).send({
-    success: true,
-    message: 'Succesfully get floors',
-    data: floors,
-  });
+  try {
+    const floors = await Floor.find({ hostelId: req.body.hostelId });
+    res.status(200).send({
+      success: true,
+      message: 'Succesfully get floors',
+      data: floors,
+    });
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
 });
 
-floorRoutes.post(
-  '/addFloor',
-  authenticateJwt,
-  expressAsyncHandler(async (req, res) => {
+floorRoutes.post('/addFloor', authenticateJwt, async (req, res) => {
+  try {
     const newFloor = new Floor({
       userId: req.body.userId,
       hostelId: req.body.hostelId,
@@ -31,13 +32,13 @@ floorRoutes.post(
       message: 'Floor added succesfully.',
       data: floor,
     });
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
-floorRoutes.delete(
-  '/deleteFloor',
-  authenticateJwt,
-  expressAsyncHandler(async (req, res) => {
+floorRoutes.delete('/deleteFloor', authenticateJwt, async (req, res) => {
+  try {
     const find = await Floor.findById(req.body.floorId);
     if (find) {
       await Floor.deleteOne({
@@ -50,7 +51,9 @@ floorRoutes.delete(
     } else {
       res.status(404).send({ success: false, message: 'Floor not found' });
     }
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
 export default floorRoutes;

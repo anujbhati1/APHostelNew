@@ -1,5 +1,4 @@
 import express from 'express';
-import expressAsyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
 import { SECRET } from '../middleware/auth.js';
 import Admin from '../models/adminModal.js';
@@ -7,34 +6,37 @@ import Admin from '../models/adminModal.js';
 const adminRoutes = express.Router();
 
 adminRoutes.post('/login', async (req, res) => {
-  const user = await Admin.findOne({
-    email: req.body.email,
-  });
-  if (user) {
-    const token = jwt.sign(
-      { username: req.body.email, role: 'admin' },
-      SECRET,
-      {
-        expiresIn: '1h',
-      }
-    );
-    res.status(200).send({
-      success: true,
-      message: 'Login successful',
-      token,
-      data: user,
+  try {
+    const user = await Admin.findOne({
+      email: req.body.email,
     });
-  } else {
-    res.status(404).send({
-      success: false,
-      message: 'Admin not found.',
-    });
+    if (user) {
+      const token = jwt.sign(
+        { username: req.body.email, role: 'admin' },
+        SECRET,
+        {
+          expiresIn: '1h',
+        }
+      );
+      res.status(200).send({
+        success: true,
+        message: 'Login successful',
+        token,
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'Admin not found.',
+      });
+    }
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
   }
 });
 
-adminRoutes.post(
-  '/signup',
-  expressAsyncHandler(async (req, res) => {
+adminRoutes.post('/signup', async (req, res) => {
+  try {
     const findEmail = await Admin.findOne({
       email: req.body.email,
     });
@@ -76,7 +78,9 @@ adminRoutes.post(
         });
       }
     }
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
 export default adminRoutes;

@@ -1,31 +1,33 @@
 import express from 'express';
-import expressAsyncHandler from 'express-async-handler';
 import User from '../models/userModal.js';
 import jwt from 'jsonwebtoken';
 
 const userRoutes = express.Router();
 
 userRoutes.post('/login', async (req, res) => {
-  const user = await User.findOne({
-    email: req.body.email,
-  });
-  if (user) {
-    res.status(200).send({
-      success: true,
-      message: 'Login successful',
-      data: user,
+  try {
+    const user = await User.findOne({
+      email: req.body.email,
     });
-  } else {
-    res.status(404).send({
-      success: false,
-      message: 'User not found.',
-    });
+    if (user) {
+      res.status(200).send({
+        success: true,
+        message: 'Login successful',
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'User not found.',
+      });
+    }
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
   }
 });
 
-userRoutes.post(
-  '/signup',
-  expressAsyncHandler(async (req, res) => {
+userRoutes.post('/signup', async (req, res) => {
+  try {
     const findEmail = await User.findOne({
       email: req.body.email,
     });
@@ -62,7 +64,9 @@ userRoutes.post(
         });
       }
     }
-  })
-);
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
 
 export default userRoutes;
