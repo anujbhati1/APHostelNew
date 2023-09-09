@@ -7,16 +7,25 @@ const bedRoutes = express.Router();
 
 bedRoutes.post('/getBeds', authenticateJwt, async (req, res) => {
   try {
-    const beds = await Bed.find({
+    const findRoom = await Room.findOne({
       hostelId: req.body.hostelId,
       floorId: req.body.floorId,
-      roomId: req.body.roomId,
+      _id: req.body.roomId,
     });
-    res.status(200).send({
-      success: true,
-      message: 'Succesfully get beds',
-      data: beds,
-    });
+    if (findRoom) {
+      const beds = await Bed.find({
+        hostelId: req.body.hostelId,
+        floorId: req.body.floorId,
+        roomId: req.body.roomId,
+      });
+      res.status(200).send({
+        success: true,
+        message: 'Succesfully get beds',
+        data: beds,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
@@ -48,7 +57,7 @@ bedRoutes.post('/addBed', authenticateJwt, async (req, res) => {
         data: bed,
       });
     } else {
-      res.status(404).json({ success: false, message: 'Room not found' });
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });

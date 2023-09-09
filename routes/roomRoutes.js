@@ -8,15 +8,23 @@ const roomRoutes = express.Router();
 
 roomRoutes.post('/getRooms', authenticateJwt, async (req, res) => {
   try {
-    const rooms = await Room.find({
+    const findFloor = await Floor.findOne({
       hostelId: req.body.hostelId,
-      floorId: req.body.floorId,
+      _id: req.body.floorId,
     });
-    res.status(200).send({
-      success: true,
-      message: 'Succesfully get rooms',
-      data: rooms,
-    });
+    if (findFloor) {
+      const rooms = await Room.find({
+        hostelId: req.body.hostelId,
+        floorId: req.body.floorId,
+      });
+      res.status(200).send({
+        success: true,
+        message: 'Succesfully get rooms',
+        data: rooms,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
@@ -89,7 +97,7 @@ roomRoutes.post('/addRoom', authenticateJwt, async (req, res) => {
         data: room,
       });
     } else {
-      res.status(404).json({ success: false, message: 'Floor not found' });
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });

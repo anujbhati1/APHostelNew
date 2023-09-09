@@ -7,14 +7,19 @@ const hostelRoutes = express.Router();
 
 hostelRoutes.post('/getHostels', authenticateJwt, async (req, res) => {
   try {
-    const hostels = await Hostel.find({
-      userId: req.body.userId,
-    });
-    res.status(200).send({
-      success: true,
-      message: 'Succesfully get hostels',
-      data: hostels,
-    });
+    const findAdmin = await Admin.findOne({ _id: req.body.userId });
+    if (findAdmin) {
+      const hostels = await Hostel.find({
+        userId: req.body.userId,
+      });
+      res.status(200).send({
+        success: true,
+        message: 'Succesfully get hostels',
+        data: hostels,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
@@ -38,7 +43,7 @@ hostelRoutes.post('/addHostel', authenticateJwt, async (req, res) => {
         data: hostel,
       });
     } else {
-      res.status(404).json({ success: false, message: 'Admin not found' });
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });

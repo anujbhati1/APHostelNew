@@ -7,12 +7,17 @@ const floorRoutes = express.Router();
 
 floorRoutes.post('/getFloors', authenticateJwt, async (req, res) => {
   try {
-    const floors = await Floor.find({ hostelId: req.body.hostelId });
-    res.status(200).send({
-      success: true,
-      message: 'Succesfully get floors',
-      data: floors,
-    });
+    const findHostel = await Hostel.findOne({ _id: req.body.hostelId });
+    if (findHostel) {
+      const floors = await Floor.find({ hostelId: req.body.hostelId });
+      res.status(200).send({
+        success: true,
+        message: 'Succesfully get floors',
+        data: floors,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
+    }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
@@ -37,7 +42,7 @@ floorRoutes.post('/addFloor', authenticateJwt, async (req, res) => {
         data: floor,
       });
     } else {
-      res.status(404).json({ success: false, message: 'Hostel not found' });
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
