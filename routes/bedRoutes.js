@@ -39,7 +39,6 @@ bedRoutes.post('/addBed', authenticateJwt, async (req, res) => {
       floorId: req.body.floorId,
       _id: req.body.roomId,
     });
-    console.log(findRoom);
     if (findRoom) {
       const newBed = new Bed({
         userId: req.body.userId,
@@ -73,10 +72,10 @@ bedRoutes.delete('/deleteBed', authenticateJwt, async (req, res) => {
       });
       res.send({
         success: true,
-        message: 'Room deleted successfully',
+        message: 'Bed deleted successfully',
       });
     } else {
-      res.status(404).send({ success: false, message: 'Room not found' });
+      res.status(404).send({ success: false, message: 'Bed not found' });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
