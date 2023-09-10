@@ -8,8 +8,16 @@ import bedRoutes from './routes/bedRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
+const encodedPassword = encodeURIComponent('Anuj@7488');
+
+const uri = `mongodb+srv://aphostels:${encodedPassword}@aphostel.gedaxdd.mongodb.net/?retryWrites=true&w=majority`;
+
 mongoose
-  .connect('mongodb://localhost:27017/Hostel')
+  .connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  // .connect('mongodb://localhost:27017/Hostel')
   .then(() => {
     console.log('connected to db');
   })
