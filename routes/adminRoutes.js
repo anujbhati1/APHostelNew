@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { SECRET } from '../middleware/auth.js';
+import { SECRET, authenticateJwt } from '../middleware/auth.js';
 import Admin from '../models/adminModal.js';
 
 const adminRoutes = express.Router();
@@ -77,6 +77,36 @@ adminRoutes.post('/signup', async (req, res) => {
           data: user,
         });
       }
+    }
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
+
+adminRoutes.post('/getProfile', authenticateJwt, async (req, res) => {
+  try {
+    const user = await Admin.findOne({
+      _id: req.body.userId,
+    });
+    if (user) {
+      const token = jwt.sign(
+        { username: req.body.email, role: 'admin' },
+        SECRET,
+        {
+          expiresIn: '1h',
+        }
+      );
+      res.status(200).send({
+        success: true,
+        message: 'Login successful',
+        token,
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'Admin not found',
+      });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });

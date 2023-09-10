@@ -2,6 +2,8 @@ import express from 'express';
 import Floor from '../models/floorModal.js';
 import { authenticateJwt } from '../middleware/auth.js';
 import Hostel from '../models/hostelModal.js';
+import Room from '../models/roomModal.js';
+import Bed from '../models/bedModal.js';
 
 const floorRoutes = express.Router();
 
@@ -55,6 +57,12 @@ floorRoutes.delete('/deleteFloor', authenticateJwt, async (req, res) => {
     if (find) {
       await Floor.deleteOne({
         _id: req.body.floorId,
+      });
+      await Room.deleteOne({
+        floorId: req.body.floorId,
+      });
+      await Bed.deleteMany({
+        floorId: req.body.floorId,
       });
       res.send({
         success: true,
