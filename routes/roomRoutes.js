@@ -1,9 +1,10 @@
 import express from 'express';
 import Room from '../models/roomModal.js';
-import Hostel from '../models/hostelModal.js';
 import Floor from '../models/floorModal.js';
 import { authenticateJwt } from '../middleware/auth.js';
 import Bed from '../models/bedModal.js';
+import Admin from '../models/adminModal.js';
+import { ObjectId } from 'mongodb';
 
 const roomRoutes = express.Router();
 
@@ -31,47 +32,78 @@ roomRoutes.post('/getRooms', authenticateJwt, async (req, res) => {
   }
 });
 
-roomRoutes.post('/getAllEmptyRooms', authenticateJwt, async (req, res) => {
+roomRoutes.post('/getAllRooms', authenticateJwt, async (req, res) => {
+  const userId = new ObjectId(req.body.userId);
+  const seatAvailible = req.body.seatAvailible;
+
   try {
-    let hostels = await Hostel.find({
-      userId: req.body.userId,
-    });
-    let floors = await Floor.find({
-      userId: req.body.userId,
-    });
-    let rooms = await Room.find({
-      seatAvailible: true,
-      userId: req.body.userId,
-    });
+    const admin = await Admin.findOne({ _id: req.body.userId });
+    if (admin) {
+      let allRooms = await Bed.aggregate([
+        {
+          $match: {
+            userId: userId,
+            seatAvailible: seatAvailible,
+          },
+        },
+        {
+          $lookup: {
+            from: 'hostels',
+            localField: 'hostelId',
+            foreignField: '_id',
+            as: 'hostelDetails',
+          },
+        },
+        {
+          $unwind: '$hostelDetails',
+        },
+        {
+          $lookup: {
+            from: 'floors',
+            localField: 'floorId',
+            foreignField: '_id',
+            as: 'floorDetails',
+          },
+        },
+        {
+          $unwind: '$floorDetails',
+        },
+        {
+          $lookup: {
+            from: 'rooms',
+            localField: 'roomId',
+            foreignField: '_id',
+            as: 'roomDetails',
+          },
+        },
+        {
+          $unwind: '$roomDetails',
+        },
+        {
+          $project: {
+            _id: 1,
+            roomId: 1,
+            floorId: 1,
+            hostelId: 1,
+            amont: 1,
+            seatAvailible: 1,
+            userId: 1,
+            bedName: 1,
+            hostelName: '$hostelDetails.hostelName',
+            floorName: '$floorDetails.floorName',
+            roomName: '$roomDetails.roomName',
+          },
+        },
+      ]);
 
-    function getAllRooms() {
-      let temArr = [];
-      for (let i = 0; i < rooms.length; i++) {
-        for (let k = 0; k < floors.length; k++) {
-          for (let j = 0; j < hostels.length; j++) {
-            if (
-              rooms[i].hostelId == hostels[j]._id + '' &&
-              rooms[i].floorId == floors[k]._id + ''
-            ) {
-              temArr.push({
-                ...rooms[i].toObject(),
-                hostelData: hostels[j].toObject(),
-                floorData: floors[k].toObject(),
-              });
-            }
-          }
-        }
-      }
-      return temArr;
+      res.status(200).send({
+        success: true,
+        message: 'Succesfully get rooms',
+        data: allRooms,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Invalid Credentials' });
     }
-
-    const data = getAllRooms();
-
-    res.status(200).send({
-      success: true,
-      message: 'Succesfully get rooms',
-      data: data,
-    });
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }
