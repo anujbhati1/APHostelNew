@@ -7,6 +7,7 @@ import roomRoutes from './routes/roomRoutes.js';
 import bedRoutes from './routes/bedRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import tenatRoutes from './routes/tenatRoutes.js';
 
 const encodedPassword = encodeURIComponent('Anuj@7488');
 
@@ -37,6 +38,7 @@ app.use('/api', hostelRoutes);
 app.use('/api', floorRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', bedRoutes);
+app.use('/api', tenatRoutes);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ success: false, message: err.message });
