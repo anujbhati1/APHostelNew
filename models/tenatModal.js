@@ -5,6 +5,8 @@ const tenatSchema = new mongoose.Schema({
   tName: { type: String, required: true },
   tMobile: { type: String },
   tParentMobile: { type: String },
+  tParentName: { type: String },
+  tAadharNo: { type: String },
   joiningDate: { type: Date },
   secDepoAmt: { type: Number },
   isStaff: { type: Boolean, default: false },

@@ -70,7 +70,7 @@ tenatRoutes.post('/addTenatRent', authenticateJwt, async (req, res) => {
 
 tenatRoutes.delete('/deleteTenat', authenticateJwt, async (req, res) => {
   try {
-    const findTenat = Tenat.findOne({ _id: req.body.tenatId });
+    const findTenat = await Tenat.findOne({ _id: req.body.tenatId });
     if (findTenat) {
       await Tenat.deleteOne({ _id: req.body.tenatId });
       res.send({
@@ -84,6 +84,26 @@ tenatRoutes.delete('/deleteTenat', authenticateJwt, async (req, res) => {
     res
       .status(404)
       .json({ success: false, message: 'Not able to delete tenat.' });
+  }
+});
+
+tenatRoutes.get('/getTenat/:id', async (req, res) => {
+  try {
+    const findTenat = await Tenat.findOne({ _id: req.params.id });
+    if (findTenat) {
+      res.send({
+        success: true,
+        message: 'Tenat Get successfully',
+        data: findTenat,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'Can not find tenat.' });
+    }
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: 'Not able to find tenat with this id.',
+    });
   }
 });
 

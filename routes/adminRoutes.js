@@ -16,7 +16,7 @@ adminRoutes.post('/login', async (req, res) => {
         { username: req.body.email, role: 'admin' },
         SECRET,
         {
-          expiresIn: '1m',
+          expiresIn: '30d',
         }
       );
       res.status(200).send({
@@ -67,7 +67,7 @@ adminRoutes.post('/signup', async (req, res) => {
           { username: req.body.email, role: 'admin' },
           SECRET,
           {
-            expiresIn: '1m',
+            expiresIn: '30d',
           }
         );
         res.status(201).send({
@@ -93,7 +93,7 @@ adminRoutes.post('/getProfile', authenticateJwt, async (req, res) => {
         { username: req.body.email, role: 'admin' },
         SECRET,
         {
-          expiresIn: '1m',
+          expiresIn: '30d',
         }
       );
       res.status(200).send({

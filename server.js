@@ -8,13 +8,17 @@ import bedRoutes from './routes/bedRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import tenatRoutes from './routes/tenatRoutes.js';
+import 'dotenv/config.js';
+import { v2 as cloudinary } from 'cloudinary';
 
-const encodedPassword = encodeURIComponent('Anuj@7488');
-
-const uri = `mongodb+srv://aphostels:${encodedPassword}@aphostel.gedaxdd.mongodb.net/?retryWrites=true&w=majority`;
+cloudinary.config({
+  cloud_name: process.env.CLOUDNARY_CLOUD_NAME,
+  api_key: process.env.CLOUDNARY_API_KEY,
+  api_secret: process.env.CLOUDNARY_API_SECRET,
+});
 
 mongoose
-  .connect(uri, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
