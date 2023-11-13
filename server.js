@@ -1,6 +1,8 @@
+import 'dotenv/config.js';
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import { v2 as cloudinary } from 'cloudinary';
 import hostelRoutes from './routes/hostelRoutes.js';
 import floorRoutes from './routes/floorRoutes.js';
 import roomRoutes from './routes/roomRoutes.js';
@@ -8,8 +10,7 @@ import bedRoutes from './routes/bedRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import tenatRoutes from './routes/tenatRoutes.js';
-import 'dotenv/config.js';
-import { v2 as cloudinary } from 'cloudinary';
+import foodRoutes from './routes/foodRoutes.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDNARY_CLOUD_NAME,
@@ -43,6 +44,7 @@ app.use('/api', floorRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', bedRoutes);
 app.use('/api', tenatRoutes);
+app.use('/api', foodRoutes);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ success: false, message: err.message });
