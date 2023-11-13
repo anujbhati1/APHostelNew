@@ -85,13 +85,7 @@ hostelRoutes.delete('/deleteHostel', authenticateJwt, async (req, res) => {
   try {
     const find = await Hostel.findById(req.body.hostelId);
     if (find) {
-      cloudinary.uploader.destroy(find.imgPublicId, (error, result) => {
-        if (error) {
-          // console.error('Error deleting image:', error);
-        } else {
-          // console.log('Image deleted successfully:', result);
-        }
-      });
+      await cloudinary.uploader.destroy(find.imgPublicId);
       await Hostel.deleteOne({ _id: req.body.hostelId });
       await Floor.deleteOne({
         hostelId: req.body.hostelId,

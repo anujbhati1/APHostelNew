@@ -44,6 +44,24 @@ foodRoutes.post(
   }
 );
 
+foodRoutes.delete('/deleteFood/:id', authenticateJwt, async (req, res) => {
+  try {
+    const findFood = await Food.findById(req.params.id);
+    if (findFood) {
+      await cloudinary.uploader.destroy(findFood.imgPublicId);
+      await Food.deleteOne({ _id: findFood._id });
+      res.status(200).json({
+        success: true,
+        message: 'Food Deleted Successfully.',
+      });
+    } else {
+      res.status(404).send({ success: false, message: 'Food not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
 // Function to delete images from Cloudinary
 const deleteImagesFromCloudinary = async (imgPublicIds) => {
   try {
