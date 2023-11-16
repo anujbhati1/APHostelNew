@@ -109,11 +109,17 @@ tenatRoutes.post('/addTenatRent', authenticateJwt, async (req, res) => {
   }
 });
 
-tenatRoutes.delete('/deleteTenat', authenticateJwt, async (req, res) => {
+tenatRoutes.delete('/deleteTenat/:id', authenticateJwt, async (req, res) => {
   try {
-    const findTenat = await Tenat.findOne({ _id: req.body.tenatId });
+    const findTenat = await Tenat.findOne({ _id: req.params.id });
     if (findTenat) {
-      await Tenat.deleteOne({ _id: req.body.tenatId });
+      if (findTenat.aadharFrntPId) {
+        await cloudinary.uploader.destroy(findTenat.aadharFrntPId);
+      }
+      if (findTenat.aadharBckPId) {
+        await cloudinary.uploader.destroy(findTenat.aadharBckPId);
+      }
+      await Tenat.deleteOne({ _id: req.params.id });
       res.send({
         success: true,
         message: 'Tenat deleted successfully',
