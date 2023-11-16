@@ -17,6 +17,9 @@ tenatRoutes.post('/addTenat', authenticateJwt, async (req, res) => {
         joiningDate: req.body.joiningDate,
         secDepoAmt: req.body.secDepoAmt,
         isStaff: req.body.isStaff,
+        aadhaeImgFrnt: req.body.aadhaeImgFrnt,
+        aadhaeImgBck: req.body.aadhaeImgBck,
+        salary: req.body.salary,
       });
 
       if (req.body.paymentDate && req.body.paymentAmt) {
@@ -24,6 +27,7 @@ tenatRoutes.post('/addTenat', authenticateJwt, async (req, res) => {
           {
             paymentDate: req.body.paymentDate,
             paymentAmt: req.body.paymentAmt,
+            description: req.body.description,
           },
         ];
       }
@@ -51,6 +55,7 @@ tenatRoutes.post('/addTenatRent', authenticateJwt, async (req, res) => {
           paymentDetails: {
             paymentDate: req.body.paymentDate,
             paymentAmt: req.body.paymentAmt,
+            description: req.body.description,
           },
         },
       }
