@@ -10,8 +10,10 @@ const tenatSchema = new mongoose.Schema({
   joiningDate: { type: Date },
   secDepoAmt: { type: Number },
   isStaff: { type: Boolean, default: false },
-  aadhaeImgFrnt: { type: String },
-  aadhaeImgBck: { type: String },
+  aadharImgFrnt: { type: String },
+  aadharFrntPId: { type: String },
+  aadharImgBck: { type: String },
+  aadharBckPId: { type: String },
   salary: { type: Number },
   paymentDetails: [
     {
